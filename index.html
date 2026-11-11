@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal ผลงานนักเรียน</title>
+<link rel="icon" type="image/png" href="./image/logo/PCSHS.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --ink:#1b2133; --muted:#6b7390; --line:#e4e7f0;
+    --brand:#4f46e5; --brand-ink:#fff; --accent:#f59e0b; --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0f1220; --card:#181c30; --ink:#eceffa; --muted:#98a0c0; --line:#2a2f4a; --brand:#818cf8; --brand-ink:#0f1220; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai",system-ui,sans-serif;line-height:1.5}
+  header{padding:28px 16px 8px;max-width:1200px;margin:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:14px;min-width:0}
+  .brand-logo{width:64px;height:64px;object-fit:contain;flex:0 0 auto}
+  h1{margin:0;font-size:1.6rem}
+  .sub{color:var(--muted);font-size:.95rem}
+  main{max-width:1200px;margin:auto;padding:8px 16px 48px}
+  section{margin-top:28px}
+  h2{font-size:1.2rem;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+  .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:.85rem}
+  .btn:hover{border-color:var(--brand)}
+  .login{opacity:.55;cursor:not-allowed}
+
+  /* highlights */
+  .hl-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .hl{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-decoration:none;color:inherit;display:block;transition:.15s}
+  .hl:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+  .preview{position:relative;height:190px;overflow:hidden;background:linear-gradient(135deg,#6366f133,#f59e0b33)}
+  .preview iframe{position:absolute;top:0;left:0;width:1280px;height:760px;border:0;transform:scale(.25);transform-origin:0 0;pointer-events:none;background:#fff}
+  .preview .ph{position:absolute;inset:0;display:grid;place-items:center;font-size:2rem;font-weight:700;color:var(--brand);opacity:.5}
+  .badge{position:absolute;top:10px;left:10px;background:var(--accent);color:#222;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;z-index:2}
+  .meta{padding:12px 14px}
+  .meta b{display:block}
+  .meta span{color:var(--muted);font-size:.85rem}
+
+  /* filters */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+  select,input[type=search]{font:inherit;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+  input[type=search]{flex:1;min-width:160px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:.85rem}
+  .chip.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+  .count{color:var(--muted);font-size:.85rem;margin:10px 2px}
+
+  /* all sites */
+  .grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .site{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-decoration:none;color:inherit;display:block}
+  .site:hover{border-color:var(--brand)}
+  .site b{display:block;font-size:.95rem}
+  .site span{color:var(--muted);font-size:.8rem}
+  .empty{padding:32px;text-align:center;color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img class="brand-logo" src="./image/logo/PCSHS.png" alt="ตราโรงเรียนวิทยาศาสตร์จุฬาภรณราชวิทยาลัย พิษณุโลก">
+    <div>
+      <h1 id="title"></h1>
+      <div class="sub" id="school"></div>
+    </div>
+  </div>
+  <button class="btn login" title="Phase 2: เข้าสู่ระบบด้วย Google Workspace @pccpl.ac.th" disabled>🔒 เข้าสู่ระบบ (เร็วๆ นี้)</button>
+</header>
+
+<main>
+  <section>
+    <h2>✨ ผลงานเด่น <button class="btn" id="shuffle">สุ่มใหม่</button></h2>
+    <div class="hl-grid" id="highlights"></div>
+  </section>
+
+  <section>
+    <h2>เว็บไซต์ทั้งหมด</h2>
+    <div class="filters">
+      <label>ปีการศึกษา <select id="year"></select></label>
+      <input type="search" id="q" placeholder="ค้นหา เช่น user3105 หรือชื่อผลงาน…">
+      <div class="chips" id="groups"></div>
+    </div>
+    <div class="count" id="count"></div>
+    <div class="grid" id="all"></div>
+  </section>
+</main>
+<footer>Portal ผลงานนักเรียน · Phase 1</footer>
+
+<script src="projects.js"></script>
+<script>
+const P = window.PORTAL;
+const $ = id => document.getElementById(id);
+document.title = P.siteTitle;
+$("title").textContent = P.siteTitle;
+$("school").textContent = P.schoolName;
+
+// ---------- สร้างรายการเว็บจาก config ----------
+const pad = n => String(n).padStart(2, "0");
+function buildSites(y){
+  const out = [];
+  for (const g of y.groups){
+    for (let n = g.from; n <= g.to; n++){
+      const user = `user${g.prefix}${pad(n)}`;
+      const o = (y.overrides || {})[user] || {};
+      out.push({
+        user, group: g.prefix, groupLabel: g.label, no: n, year: y.year,
+        url: `${y.base}/${user}`,
+        title: o.title || "", student: o.student || "",
+        highlight: (y.highlights || []).includes(user),
+      });
+    }
+  }
+  return out;
+}
+const DATA = P.years.map(y => ({ ...y, sites: buildSites(y) }));
+const latest = Math.max(...DATA.map(y => y.year));
+
+// ---------- state ----------
+const state = { year: latest, group: "all", q: "" };
+const cur = () => DATA.find(y => y.year === state.year);
+
+// ---------- highlights (สุ่มทุกครั้งที่โหลด/กดสุ่มใหม่) ----------
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a }
+function label(s){ return s.title || s.user }
+function sub(s){ return [s.student, `${s.groupLabel} · เลขที่ ${s.no}`].filter(Boolean).join(" · ") }
+
+function renderHighlights(){
+  const y = cur();
+  let pool = y.sites.filter(s => s.highlight);
+  if (!pool.length) pool = y.sites;
+  const picks = shuffle(pool).slice(0, P.highlightCount);
+  $("highlights").innerHTML = picks.map(s => `
+    <a class="hl" href="${s.url}" target="_blank" rel="noopener">
+      <div class="preview">
+        <span class="badge">ผลงานเด่น</span>
+        <div class="ph">${s.user.replace("user","")}</div>
+        <iframe src="${s.url}" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" title="${s.user}"></iframe>
+      </div>
+      <div class="meta"><b>${label(s)}</b><span>${sub(s)}</span></div>
+    </a>`).join("");
+}
+
+// ---------- ตัวกรอง ----------
+function renderControls(){
+  $("year").innerHTML = DATA.map(y => y.year).sort((a,b)=>b-a)
+    .map(v => `<option value="${v}" ${v===state.year?"selected":""}>พ.ศ. ${v}${v===latest?" (ล่าสุด)":""}</option>`).join("");
+  const gs = cur().groups;
+  $("groups").innerHTML =
+    `<button class="chip ${state.group==="all"?"on":""}" data-g="all">ทั้งหมด</button>` +
+    gs.map(g => `<button class="chip ${state.group===g.prefix?"on":""}" data-g="${g.prefix}">${g.label}</button>`).join("");
+}
+
+function renderAll(){
+  const q = state.q.trim().toLowerCase();
+  const list = cur().sites.filter(s =>
+    (state.group === "all" || s.group === state.group) &&
+    (!q || [s.user, s.title, s.student].join(" ").toLowerCase().includes(q)));
+  $("count").textContent = `พบ ${list.length} เว็บไซต์ · ปี พ.ศ. ${state.year}`;
+  $("all").innerHTML = list.length ? list.map(s => `
+    <a class="site" href="${s.url}" target="_blank" rel="noopener">
+      <b>${label(s)}</b><span>${sub(s)}</span>
+    </a>`).join("") : `<div class="empty" style="grid-column:1/-1">ไม่พบเว็บไซต์ที่ตรงกับเงื่อนไข</div>`;
+}
+
+// ---------- events ----------
+$("year").addEventListener("change", e => { state.year = +e.target.value; state.group = "all"; renderControls(); renderHighlights(); renderAll(); });
+$("groups").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if(!b) return; state.group = b.dataset.g; renderControls(); renderAll(); });
+$("q").addEventListener("input", e => { state.q = e.target.value; renderAll(); });
+$("shuffle").addEventListener("click", renderHighlights);
+
+renderControls(); renderHighlights(); renderAll();
+</script>
+</body>
+</html>
